@@ -108,20 +108,25 @@ cp references/detection/coco_utils.py ../
 - We received a file of roughly 85K labelled images and the classes observed (updated_2018_detections.csv)
 - In order to build our dataset we combine the bounding boxes from our naive model above, with our actual observed class from the .csv
 - Below are the labels present in our data.
-	- bird ==> 0
-	- cat ==> 1
-	- coyote ==> 2
-	- dog ==> 3
-	- e. cottontail ==> 4
-	- empty ==> 5
-	- human ==> 6
-	- lawn mower ==> 7
-	- raccoon ==> 8
-	- rat ==> 9
-	- squirrel ==> 10
-	- striped skunk ==> 11
-	- v. opossum ==> 12
-	- w. t. deer ==> 13
+
+``` python
+label_encoding = {
+    0  : 'bird',
+    1  : 'cat', 
+    2  : 'coyote',
+    3  : 'dog',
+    4  : 'e. cottontail',
+    5  : 'empty',
+    6  : 'human',
+    7  : 'lawn mower',
+    8  : 'raccoon',
+    9  : 'rat',
+    10 : 'squirrel',
+    11 : 'striped skunk',
+    12 : 'v. opossum',
+    13 : 'w. t. deer'
+}
+```
 
 ### Final Object Detection Fine-Tuning (Train_Torch_FastRCNN.ipynb)
 - Our base model is a [Faster R-CNN Resnet 50](https://pytorch.org/vision/stable/_modules/torchvision/models/detection/faster_rcnn.html)
