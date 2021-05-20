@@ -1,4 +1,5 @@
 import os
+import tqdm
 import torch
 import cv2
 import torchvision
@@ -6,6 +7,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from bounding_box import bounding_box as bb
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from PIL import Image
 from PIL import ImageDraw
 
@@ -70,7 +72,7 @@ def create_image_dict(im_list, im_df):
     return im_dict, le
 
 
-class WildlifeDataLoader(torch.utils.Dataset):
+class WildlifeDataLoader(torch.utils.data.Dataset):
     def __init__(self, im_dict, transforms=None, root='./images/'):
         self.root = root
         self.im_dict = im_dict
@@ -203,3 +205,38 @@ def visualize_output(im_path, model, le):
     image = np.asarray(Image.open(im_path)).copy()
     bb.add(image, bbox[0], bbox[1], bbox[2], bbox[3], label, 'red')
     cv2.imshow(image)
+
+def evaluate_performance(dataframe, model, le, threshold=0.5):
+    """
+    Function takes dataframe with directory and label information, model, 
+        and label encoder object
+    returns predictions, actual values, image_name, and confidence level
+    """
+    preds = []
+    actual = []
+    ims = []
+    confidence = []
+
+    model.eval()
+    for dir, act_lab in tqdm(dataframe[['Directory', 'ShortName']].values):
+        with torch.no_grad():
+            prediction = model([image_loader(f'./images/{dir}')])
+
+        # catch instances w/ no predictions
+        try:
+            if prediction[0]['scores'][0] > threshold:
+                pred_label = le.inverse_transform([prediction[0]['labels'][0].to('cpu')])[0]
+                preds.append(pred_label)
+                confidence.append(prediction[0]['scores'][0])
+            else:
+                preds.append('empty')
+                confidence.append(prediction[0]['scores'][0])
+
+        except:
+            preds.append('empty')
+            confidence.append(0)
+
+        actual.append(act_lab)
+        ims.append(dir)
+
+    return preds, actual, ims, confidence
