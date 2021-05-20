@@ -1,4 +1,5 @@
 # Species Identification Project
+![](sample_detection.png?raw=true)
 ## Directory Structure
 ```
 project
