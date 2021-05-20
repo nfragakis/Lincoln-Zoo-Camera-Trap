@@ -54,6 +54,10 @@ All notebooks will run in colab with specific install/dependency commands presen
 
 ## Setup 
 ``` bash
+pip install -r requirements.txt
+```
+
+``` bash
 # Download TorchVision repo to use some files from
 # references/detection
 git clone https://github.com/pytorch/vision.git
