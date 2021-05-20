@@ -133,6 +133,7 @@ label_encoding = {
 	- This model has been pre-trained on the [COCO Dataset](https://cocodataset.org/)
 
 ## TODO
+- Add resnet50 backbone from FastAI to FastRCNN model
 - Document Training Process & Dataset
     - D02
     - All images 
