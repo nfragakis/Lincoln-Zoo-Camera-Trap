@@ -134,6 +134,6 @@ cp references/detection/coco_utils.py ../
 - Relevant Papers
     - [Microsoft Camera Traps](https://github.com/microsoft/CameraTraps)
     - [AI for Earth](https://www.microsoft.com/en-us/ai/ai-for-earth)
-    - [Deep Learning Object Detection Methods for Ecological Camera Trap Data] (https://arxiv.org/abs/1803.10842)
+    - [Deep Learning Object Detection Methods for Ecological Camera Trap Data](https://arxiv.org/abs/1803.10842)
     - [Camera Trap ML Survey](https://github.com/agentmorris/camera-trap-ml-survey)
     - [CalTech Camera Traps](https://beerys.github.io/CaltechCameraTraps/)
