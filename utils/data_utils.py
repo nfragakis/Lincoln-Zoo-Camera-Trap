@@ -5,11 +5,29 @@ import cv2
 import torchvision
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder
 from bounding_box import bounding_box as bb
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from PIL import Image
 from PIL import ImageDraw
+
+one_hot_labels = {
+    0  : 'lawn mower',
+    1  : 'cat', 
+    2  : 'coyote',
+    3  : 'dog',
+    4  : 'e. cottontail',
+    5  : 'human',
+    6  : 'bird',
+    7  : 'raccoon',
+    8  : 'rat',
+    9 : 'squirrel',
+    10 : 'striped skunk',
+    11 : 'v. opossum',
+    12 : 'w. t. deer'
+}
+
+# inverse 
+labels_one_hot = {v: k for k, v in one_hot_labels.items()}
 
 def stratify_sample(df, inds_per_class):
     sample = df[df['ShortName'] != 'empty']
@@ -44,8 +62,7 @@ def create_image_dict(im_list, im_df):
     im_dict = {}
 
     # one-hot encode im_df labels
-    le = LabelEncoder()
-    im_df['OneHotClass'] = le.fit_transform(im_df['ShortName'])
+    im_df['OneHotClass'] = im_df['ShortName'].apply(lambda x: labels_one_hot[x])
 
     for im in im_list:
         try:
@@ -69,7 +86,7 @@ def create_image_dict(im_list, im_df):
             print(e)
             # some images not included in
             # im_df or have empty labels
-    return im_dict, le
+    return im_dict
 
 
 class WildlifeDataLoader(torch.utils.data.Dataset):
@@ -160,7 +177,7 @@ def image_loader(image_name):
     image = loader(image).float()
     return image.cuda()
 
-def visualize_output_bw(im_path, model, le):
+def visualize_output_bw(im_path, model):
     """load image from im_path and call model
     visualize output w/ bounding box,
     predicted class, and confidence """
@@ -183,11 +200,11 @@ def visualize_output_bw(im_path, model, le):
                (right, top), (left, top)], width=2, fill='red')
 
     # print predicted box label and confidence score
-    print(le.inverse_transform(prediction[0]['labels'].to('cpu'))[0])
+    print(one_hot_labels[prediction[0]['labels'].to('cpu')[0]])
     print('Confidence: ', prediction[0]['scores'][0])
     return image
 
-def visualize_output(im_path, model, le):
+def visualize_output(im_path, model):
     """
     visualize object detction output
     using bounding box libary: only works with RGB
@@ -197,16 +214,16 @@ def visualize_output(im_path, model, le):
         prediction = model([image_loader(im_path)])
 
     bbox = prediction[0]['boxes'][0].to('cpu').numpy()
-    label = le.inverse_transform([prediction[0]['labels'][0].to('cpu')])[0]
-    score = prediction[0]['scores'][0].to('cpu').item()
 
+    label = one_hot_labels[int(prediction[0]['labels'][0].to('cpu'))]
+    score = prediction[0]['scores'][0].to('cpu').item()
     label = label + ': ' + str(np.round((score * 100), 2)) + '%'
 
     image = np.asarray(Image.open(im_path)).copy()
     bb.add(image, bbox[0], bbox[1], bbox[2], bbox[3], label, 'red')
     cv2.imshow(image)
 
-def evaluate_performance(dataframe, model, le, threshold=0.5):
+def evaluate_performance(dataframe, model, threshold=0.5):
     """
     Function takes dataframe with directory and label information, model, 
         and label encoder object
@@ -225,7 +242,7 @@ def evaluate_performance(dataframe, model, le, threshold=0.5):
         # catch instances w/ no predictions
         try:
             if prediction[0]['scores'][0] > threshold:
-                pred_label = le.inverse_transform([prediction[0]['labels'][0].to('cpu')])[0]
+                pred_label = one_hot_labels[int(prediction[0]['labels'][0].to('cpu'))]
                 preds.append(pred_label)
                 confidence.append(prediction[0]['scores'][0])
             else:
