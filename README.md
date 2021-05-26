@@ -1,75 +1,15 @@
 # Species Identification Project
+## TODO
+- save .h5 files for trained model
+- Performance Report
+- Relevant Papers
+    - [Microsoft Camera Traps](https://github.com/microsoft/CameraTraps)
+    - [AI for Earth](https://www.microsoft.com/en-us/ai/ai-for-earth)
+    - [Deep Learning Object Detection Methods for Ecological Camera Trap Data](https://arxiv.org/abs/1803.10842)
+    - [Camera Trap ML Survey](https://github.com/agentmorris/camera-trap-ml-survey)
+    - [CalTech Camera Traps](https://beerys.github.io/CaltechCameraTraps/)
 ![](sample_detection.png?raw=true)
-## Directory Structure
-```
-project
-|	README.md
-|	AnimalDetector.ipynb
-|	TrainTorchFastRCNN.ipynb
-|	updated_2018_detections.csv
-|	
-|
-|___images
-	|___D
-	|	|__D02
-	|	|__D03
-	|	|__D04
-	|	|__D05
-	|	|__D06
-	|	|__D07
-	|	|__D08
-	|	|__D09
-	|	|__D10
-	|	
-	|___J
-	|	|__J01
-	|	
-	|___R
-	|	|__R01
-	|	|__R02
-	|	|__R03
-	|	|__R04
-	|	|__R05
-	|	|__R06
-	|	|__R07
-	|	|__R08
-	|	|__R09
-	|	|__R10
-	|
-	|___S
-	|	|__S01
-	|	|__S02
-	|	|__S03
-	|	|__S04
-	|	|__S05
-	|	|__S06
-	|	|__S07
-	|	|__S08
-	|	|__S09
-	|	|__S10
-```
-**Image file structure is neccesary when running in colab to avoid memory constraints that occur if they're all in the same directory**
 
-All notebooks will run in colab with specific install/dependency commands present for each job
-
-## Setup 
-``` bash
-pip install -r requirements.txt
-```
-
-``` bash
-# Download TorchVision repo to use some files from
-# references/detection
-git clone https://github.com/pytorch/vision.git
-cd vision
-git checkout v0.3.0
-
-cp references/detection/utils.py ../
-cp references/detection/transforms.py ../
-cp references/detection/coco_eval.py ../
-cp references/detection/engine.py ../
-cp references/detection/coco_utils.py ../
-```
 ## Animal Detections (AnimalDetector.ipynb)
 ### Naive Detection
 - The first phase of the project leverages the [CameraTraps](https://github.com/microsoft/CameraTraps) package released by Microsoft.
@@ -132,19 +72,83 @@ label_encoding = {
 - Our base model is a [Faster R-CNN Resnet 50](https://pytorch.org/vision/stable/_modules/torchvision/models/detection/faster_rcnn.html)
 	- This model has been pre-trained on the [COCO Dataset](https://cocodataset.org/)
 
-## TODO
-- Add resnet50 backbone from FastAI to FastRCNN model
-- Document Training Process & Dataset
+### Performance
+The process to train the FRCNN Object Detection Model began with running through a single camera location, D02, for 20 epochs. This location provided the clearest images, as well as a proportionate sample of animals relative to the rest of the dataset, containing roughly 8000 images.
+Next, we run through all images with detections present for 10 epochs. This totalled roughly 35000 total images and allowed are model to increase its generalizability on unseen camera angles and conditions.
+Finally, we return to the D02 location, but this time supplement the dataset with **TODO**
+- Training Process
     - D02
     - All images 
     - D02 with Image Supplementation for underrepresented classes
-- save .h5 files for trained model
 - Report on performance
 	- How many samples per class are needed to reach acceptable level
 	- Is there a difference between day/night or season?
-- Relevant Papers
-    - [Microsoft Camera Traps](https://github.com/microsoft/CameraTraps)
-    - [AI for Earth](https://www.microsoft.com/en-us/ai/ai-for-earth)
-    - [Deep Learning Object Detection Methods for Ecological Camera Trap Data](https://arxiv.org/abs/1803.10842)
-    - [Camera Trap ML Survey](https://github.com/agentmorris/camera-trap-ml-survey)
-    - [CalTech Camera Traps](https://beerys.github.io/CaltechCameraTraps/)
+
+## Setup 
+``` bash
+pip install -r requirements.txt
+```
+
+``` bash
+# Download TorchVision repo to use some files from
+# references/detection
+git clone https://github.com/pytorch/vision.git
+cd vision
+git checkout v0.3.0
+
+cp references/detection/utils.py ../
+cp references/detection/transforms.py ../
+cp references/detection/coco_eval.py ../
+cp references/detection/engine.py ../
+cp references/detection/coco_utils.py ../
+```
+### Directory Structure
+```
+project
+|	README.md
+|	AnimalDetector.ipynb
+|	TrainTorchFastRCNN.ipynb
+|	updated_2018_detections.csv
+|	
+|
+|___images
+	|___D
+	|	|__D02
+	|	|__D03
+	|	|__D04
+	|	|__D05
+	|	|__D06
+	|	|__D07
+	|	|__D08
+	|	|__D09
+	|	|__D10
+	|	
+	|___J
+	|	|__J01
+	|	
+	|___R
+	|	|__R01
+	|	|__R02
+	|	|__R03
+	|	|__R04
+	|	|__R05
+	|	|__R06
+	|	|__R07
+	|	|__R08
+	|	|__R09
+	|	|__R10
+	|
+	|___S
+	|	|__S01
+	|	|__S02
+	|	|__S03
+	|	|__S04
+	|	|__S05
+	|	|__S06
+	|	|__S07
+	|	|__S08
+	|	|__S09
+	|	|__S10
+```
+**Image file structure is neccesary when running in colab to avoid memory constraints that occur if they're all in the same directory**
+All notebooks will run in colab with specific install/dependency commands present for each job
