@@ -51,20 +51,19 @@
 
 ``` python
 label_encoding = {
-    0  : 'bird',
+    0  : 'lawn mower',
     1  : 'cat', 
     2  : 'coyote',
     3  : 'dog',
     4  : 'e. cottontail',
-    5  : 'empty',
-    6  : 'human',
-    7  : 'lawn mower',
-    8  : 'raccoon',
-    9  : 'rat',
-    10 : 'squirrel',
-    11 : 'striped skunk',
-    12 : 'v. opossum',
-    13 : 'w. t. deer'
+    5  : 'human',
+    6  : 'bird',
+    7  : 'raccoon',
+    8  : 'rat',
+    9 : 'squirrel',
+    10 : 'striped skunk',
+    11 : 'v. opossum',
+    12 : 'w. t. deer'
 }
 ```
 
