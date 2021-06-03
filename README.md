@@ -50,7 +50,7 @@
         - 25 epochs randomly sampled dataset
 ## Final Performance
     - sample based performance (how many instances of each class to get x performance)
-    ![](class_performance.png?raw=true)
+![](class_performance.png?raw=true)
     - potential black/white based performance if colab working
 
 ## Animal Detections (AnimalDetector.ipynb)
