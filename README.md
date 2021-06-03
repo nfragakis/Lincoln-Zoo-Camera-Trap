@@ -1,7 +1,10 @@
 # Species Identification Project
 ## TODO
 - save .h5 files for trained model
-- Performance Report
+- finish paper from outline
+- summarize paper on README
+- performance figures
+- detailed setup/re-training instructions
 - Relevant Papers
     - [Microsoft Camera Traps](https://github.com/microsoft/CameraTraps)
     - [AI for Earth](https://www.microsoft.com/en-us/ai/ai-for-earth)
@@ -9,6 +12,44 @@
     - [Camera Trap ML Survey](https://github.com/agentmorris/camera-trap-ml-survey)
     - [CalTech Camera Traps](https://beerys.github.io/CaltechCameraTraps/)
 ![](sample_detection.png?raw=true)
+
+## Introduction
+- Problem Statement
+- Solution Outline
+- Final Deliverable/model
+
+## Dataset
+- Locations / qty, etc
+
+## Training Process
+- Resnet 50 for classification
+    - pre-trained on image net
+    - Undersampling empty class
+    - transforms
+        - flip
+        - black/white
+    - Progressive Resizing
+        - 64 x 6 epochs, 2 epochs fine-tune last layer
+        - 128 x 12, 4 epochs
+        - 256 X 18, 6 epochs
+        - 512 x 24, 8 epochs
+    - one_cycle_lr (cite leslie paper)
+    - final performance statistics
+- Naive Detection to build datasets
+    - explanation of model
+    - Wildlife AI microsoft citation
+    - output training data for final model
+- FRCNN for object detection
+    - training data
+    - load pre-trained classification resnet 50 from above into backbone
+    - training process
+        - 25 epochs randomly sampled dataset
+        - 25 epochs evenly distributed amongst classes
+        - 25 epochs randomly sampled dataset
+- final performance
+- sample based performance (how many instances of each class to get x performance)
+![](class_performance.png?raw=true)
+- potential black/white based performance if colab working
 
 ## Animal Detections (AnimalDetector.ipynb)
 ### Naive Detection

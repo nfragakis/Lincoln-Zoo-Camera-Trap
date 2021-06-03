@@ -26,7 +26,6 @@ one_hot_labels = {
     12 : 'w. t. deer'
 }
 
-# inverse 
 labels_one_hot = {v: k for k, v in one_hot_labels.items()}
 
 def stratify_sample(df, inds_per_class):
