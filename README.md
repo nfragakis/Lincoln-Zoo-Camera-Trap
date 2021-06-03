@@ -4,6 +4,8 @@
 - finish paper from outline
 - summarize paper on README
 - performance figures
+    - confusion matrix
+    - inter-class metrics
 - detailed setup/re-training instructions
 - Relevant Papers
     - [Microsoft Camera Traps](https://github.com/microsoft/CameraTraps)
