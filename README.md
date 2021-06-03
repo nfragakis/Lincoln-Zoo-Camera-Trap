@@ -48,10 +48,10 @@
         - 25 epochs randomly sampled dataset
         - 25 epochs evenly distributed amongst classes
         - 25 epochs randomly sampled dataset
-- final performance
-- sample based performance (how many instances of each class to get x performance)
-![](class_performance.png?raw=true)
-- potential black/white based performance if colab working
+## Final Performance
+    - sample based performance (how many instances of each class to get x performance)
+    ![](class_performance.png?raw=true)
+    - potential black/white based performance if colab working
 
 ## Animal Detections (AnimalDetector.ipynb)
 ### Naive Detection
