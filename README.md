@@ -22,7 +22,7 @@
 - Locations / qty, etc
 
 ## Training Process
-- Resnet 50 for classification
+- Resnet 50 for classification (resnet50_classification.ipynb)
     - pre-trained on image net
     - Undersampling empty class
     - transforms
