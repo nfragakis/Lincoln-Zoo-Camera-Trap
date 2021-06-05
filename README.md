@@ -1,6 +1,5 @@
 # Species Identification Project
 ## TODO
-- save .h5 files for trained model
 - finish paper from outline
 - summarize paper on README
 - performance figures
@@ -14,14 +13,6 @@
     - [Camera Trap ML Survey](https://github.com/agentmorris/camera-trap-ml-survey)
     - [CalTech Camera Traps](https://beerys.github.io/CaltechCameraTraps/)
 ![](sample_detection.png?raw=true)
-
-## Introduction
-- Problem Statement
-- Solution Outline
-- Final Deliverable/model
-
-## Dataset
-- Locations / qty, etc
 
 ## Training Process
 - Resnet 50 for classification (resnet50_classification.ipynb)
@@ -53,8 +44,48 @@
 ![](class_performance.png?raw=true)
     - potential black/white based performance if colab working
 
-## Animal Detections (AnimalDetector.ipynb)
-### Naive Detection
+## Introduction
+One of the primary ecology activities of the Lincoln Park Zoo is to monitor the migration patterns of local animal populations and track these changes. In order to accomplish this objective, they run a quarterly initiative placing camera traps in 28 locations across the surrounding areas.
+
+As you can imagine these camera traps generate a large amount of un-labelled data that the zoo workers then must comb through, identifying species, before they are able to start the primary job of interpreting the data collected.
+
+With this project, we aim to build a software system that allows the user and an AI model to work symbiotically, letting the wildlife scientists focus on their areas of expertise, not labelling images.
+
+In order to accomplish this, we have developed a computer vision, object detection model, built on the PyTorch framework. This model, trained on previously labelled data by the zoo, is able to identify and localize in images up to 14 species commonly found in the area. 
+
+## Data
+As mentioned above we use a sub-sample of camera trap images that was previously labelled by Lincoln Park Zoo to train this model. The meta-data associated with these labeled images can be found in the included file (updated_2018_detections.csv) containing roughly 86,000 annotations taken from camera traps across 28 spots around the city of Chicago.
+
+- Below are the labels present in our data.
+
+``` python
+label_encoding = {
+    0  : 'lawn mower',
+    1  : 'cat', 
+    2  : 'coyote',
+    3  : 'dog',
+    4  : 'e. cottontail',
+    5  : 'human',
+    6  : 'bird',
+    7  : 'raccoon',
+    8  : 'rat',
+    9 : 'squirrel',
+    10 : 'striped skunk',
+    11 : 'v. opossum',
+    12 : 'w. t. deer'
+}
+```
+
+## Model Training Overview
+#### We use a three part approach to build our model and training data from the provided materials.
+- 1) Classification model using the labelled dataset directly to predict the species present in all images.
+- 2) Naive Object Detection model (pre-trained by Microsoft AI) that is taught to identify whether any Humans, Animals, or Vehicles are present in a given image and draw a bounding box of the identified object.
+- 3) Combining the outputted bounding box/label from our Naive Detection Model and the human generated labels, we build our primary Object Detection, using the trained classifier from Step 1 as our backbone. 
+
+These steps are outlined in more detail below...
+
+### Animal Detections (AnimalDetector.ipynb)
+#### Naive Detection
 - The first phase of the project leverages the [CameraTraps](https://github.com/microsoft/CameraTraps) package released by Microsoft.
 	- This package includes a naive image detector which outputs bounding boxes and classifications for 3 total classes (Animal, Human, & Vehicle)
 - We leverage this package to bootstrap our training data in order to train an object detection model specific to our project data and labels.
@@ -86,28 +117,6 @@
      ]
     }
    ]
-```
-### Labelled Data
-- We received a file of roughly 85K labelled images and the classes observed (updated_2018_detections.csv)
-- In order to build our dataset we combine the bounding boxes from our naive model above, with our actual observed class from the .csv
-- Below are the labels present in our data.
-
-``` python
-label_encoding = {
-    0  : 'lawn mower',
-    1  : 'cat', 
-    2  : 'coyote',
-    3  : 'dog',
-    4  : 'e. cottontail',
-    5  : 'human',
-    6  : 'bird',
-    7  : 'raccoon',
-    8  : 'rat',
-    9 : 'squirrel',
-    10 : 'striped skunk',
-    11 : 'v. opossum',
-    12 : 'w. t. deer'
-}
 ```
 
 ### Final Object Detection Fine-Tuning (Train_Torch_FastRCNN.ipynb)
@@ -144,6 +153,29 @@ cp references/detection/coco_eval.py ../
 cp references/detection/engine.py ../
 cp references/detection/coco_utils.py ../
 ```
+
+#### Load pre-trained model 
+``` python
+from utils.data_utils import get_instance_segmentation_model
+
+device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
+model = get_instance_segmentation_model(14, pretrained=False)
+model.load_state_dict(torch.load('./model.pth'))
+model.to(device)
+```
+
+#### Inference Example
+``` python
+model.eval()
+with torch.no_grad():
+    prediction = model([image_loader(im_path)])
+    
+bbox = prediction[0]['boxes'][0].to('cpu').numpy()
+label = label_encoding[int(prediction[0]['labels'][0].to('cpu'))]
+score = prediction[0]['scores'][0].to('cpu').item()
+```
+
 ### Directory Structure
 ```
 project
