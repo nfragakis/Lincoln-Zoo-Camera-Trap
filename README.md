@@ -1,10 +1,8 @@
-# Species Identification Project
+# Lincoln Park Camera Trap Species Identification
 ## TODO
 - finish paper from outline
-- summarize paper on README
 - performance figures
     - confusion matrix
-    - inter-class metrics
 - detailed setup/re-training instructions
 - Relevant Papers
     - [Microsoft Camera Traps](https://github.com/microsoft/CameraTraps)
@@ -12,22 +10,8 @@
     - [Deep Learning Object Detection Methods for Ecological Camera Trap Data](https://arxiv.org/abs/1803.10842)
     - [Camera Trap ML Survey](https://github.com/agentmorris/camera-trap-ml-survey)
     - [CalTech Camera Traps](https://beerys.github.io/CaltechCameraTraps/)
-![](sample_detection.png?raw=true)
 
 ## Training Process
-- Resnet 50 for classification (resnet50_classification.ipynb)
-    - pre-trained on image net
-    - Undersampling empty class
-    - transforms
-        - flip
-        - black/white
-    - Progressive Resizing
-        - 64 x 6 epochs, 2 epochs fine-tune last layer
-        - 128 x 12, 4 epochs
-        - 256 X 18, 6 epochs
-        - 512 x 24, 8 epochs
-    - one_cycle_lr (cite leslie paper)
-    - final performance statistics
 - Naive Detection to build datasets
     - explanation of model
     - Wildlife AI microsoft citation
@@ -41,7 +25,7 @@
         - 25 epochs randomly sampled dataset
 ## Final Performance
     - sample based performance (how many instances of each class to get x performance)
-![](class_performance.png?raw=true)
+![](images/class_performance.png?raw=true)
     - potential black/white based performance if colab working
 
 ## Introduction
@@ -53,10 +37,12 @@ With this project, we aim to build a software system that allows the user and an
 
 In order to accomplish this, we have developed a computer vision, object detection model, built on the PyTorch framework. This model, trained on previously labelled data by the zoo, is able to identify and localize in images up to 14 species commonly found in the area. 
 
+![](images/sample_detection.png?raw=true)
+
 ## Data
 As mentioned above we use a sub-sample of camera trap images that was previously labelled by Lincoln Park Zoo to train this model. The meta-data associated with these labeled images can be found in the included file (updated_2018_detections.csv) containing roughly 86,000 annotations taken from camera traps across 28 spots around the city of Chicago.
 
-- Below are the labels present in our data.
+- Below are the labelled species present in our data.
 
 ``` python
 label_encoding = {
@@ -75,22 +61,71 @@ label_encoding = {
     12 : 'w. t. deer'
 }
 ```
+![](images/species_count.png?raw=true)
 
 ## Model Training Overview
 #### We use a three part approach to build our model and training data from the provided materials.
-- 1) Classification model using the labelled dataset directly to predict the species present in all images.
-- 2) Naive Object Detection model (pre-trained by Microsoft AI) that is taught to identify whether any Humans, Animals, or Vehicles are present in a given image and draw a bounding box of the identified object.
-- 3) Combining the outputted bounding box/label from our Naive Detection Model and the human generated labels, we build our primary Object Detection, using the trained classifier from Step 1 as our backbone. 
+- 1. **Backbone Classification Model** 
+    - Using the labelled dataset directly to predict the species present in all images.
+- 2. **Naive Animal Detection Model**
+    - Pre-trained by Microsoft AI to identify whether any Humans, Animals, or Vehicles are present in a given image and draw a bounding box of the identified object.
+- 3. **Primary Animal Detection Model** 
+    - Combining the outputted bounding box/label from our Naive Detection Model and the human generated labels, we build our primary Object Detection, using the trained classifier from Step 1 as our backbone. 
+
+![](images/frcnn.png?raw=true)
 
 These steps are outlined in more detail below...
 
-### Animal Detections (AnimalDetector.ipynb)
-#### Naive Detection
-- The first phase of the project leverages the [CameraTraps](https://github.com/microsoft/CameraTraps) package released by Microsoft.
+### Backbone Classification Model
+- (resnet50_classification.ipynb)
+- The first phase of our process was to build the backbone model for our final Object Detection Model. This will be the base module of our Regional Convolutional Neural Network. 
+
+##### Training Process
+- We start with a stock Resnet50 model, that was pre-trained on ImageNet as our backbone
+- The dataset used to train our model is a randomized collection of images spanning all camera locations (~25,000 total images).
+    - We choose to undersample the empty class (indicating a false triggering of camera and no actual animal present) due to the high proportion of these samples in our dataset.
+    - Additionally a number of image transformations are randomly applied to make our model more robust, these included...
+        - Flips, Converting RGB images to Black & White, and randomly adjusting the hue and saturation.
+    - All of these steps allowed the model to generalize to unseen samples far better, becoming more resilient to changes in lighting, location, and time of captured images.
+- During our training process we implement a sequential re-sizing of our training data in order to get more predictive power out of our relatively small sample set. This allows the model to learn more and more about the distribution of images for each subsequent re-sizing, effectively generating a new training dataset at each step.
+- All training cycles included a one cycle learning rate approach as made popular by Leslie Smith in his 2018 [paper](https://arxiv.org/pdf/1803.09820.pdf%E5%92%8CSylvain)
+- The training schedule implemented was as follows, with each step containing full training cycles and fine-tuning cycles where only the final classification layer weights are updated.
+    - Image Size (64x64)
+        - 6 Full Cycle Epochs, 2 Fine-Tuning
+    - Image Size (128x128)
+        - 12 Full Cycle Epochs, 4 Fine-Tuning
+    - Image Size (256x256)
+        - 18 Full Cycle Epochs, 6 Fine-Tuning
+    - Image Size (512x512)
+        - 24 Full Cycle Epochs, 8 Fine-Tuning
+
+##### Final Test Set Performance
+| **species** | **precision**     | **recall** | **f1-score** | **support** |
+|---------------|--------|----------|---------|------|
+| bird          | 0.79   | 0.51     | 0.62    | 171  |
+| cat           | 0.36   | 0.27     | 0.31    | 15   |
+| coyote        | 0.83   | 0.72     | 0.77    | 61   |
+| dog           | 0.61   | 0.54     | 0.58    | 35   |
+| e. cottontail | 0.81   | 0.70     | 0.75    | 134  |
+| empty         | 0.92   | 0.97     | 0.94    | 3287 |
+| human         | 0.91   | 0.88     | 0.89    | 295  |
+| lawn mower    | 1.00   | 0.25     | 0.40    | 8    |
+| raccoon       | 0.89   | 0.93     | 0.91    | 347  |
+| rat           | 0.00   | 0.00     | 0.00    | 8    |
+| squirrel      | 0.81   | 0.66     | 0.73    | 386  |
+| striped skunk | 0.92   | 0.86     | 0.89    | 14   |
+| v. opossum    | 0.74   | 0.63     | 0.68    | 59   |
+| w. t. deer    | 0.89   | 0.82     | 0.86    | 112  |
+| **accuracy**      | **0.90**   | **4932**     |         |      |
+| **macro avg**     | **0.75**   | **0.62**     | **0.67**    | **4932** |
+| **weighted avg**  | **0.89**   | **0.90**     | **0.89**    | **4932** |
+
+### Naive Animal Detection Model
+- (AnimalDetector.ipynb)
+- The second phase of the project leverages the [CameraTraps](https://github.com/microsoft/CameraTraps) package released by Microsoft.
 	- This package includes a naive image detector which outputs bounding boxes and classifications for 3 total classes (Animal, Human, & Vehicle)
 - We leverage this package to bootstrap our training data in order to train an object detection model specific to our project data and labels.
 - Output of model can be seen below, with bounding box coords and base class for each image
-
 ``` json
 {
    "file": "./drive/My Drive/DePaul Research/images/D/D02/CHIL - D02-BMT1-JA18_00722.JPG",
@@ -118,8 +153,7 @@ These steps are outlined in more detail below...
     }
    ]
 ```
-
-### Final Object Detection Fine-Tuning (Train_Torch_FastRCNN.ipynb)
+### Primary Animal Detection Model
 - Our base model is a [Faster R-CNN Resnet 50](https://pytorch.org/vision/stable/_modules/torchvision/models/detection/faster_rcnn.html)
 	- This model has been pre-trained on the [COCO Dataset](https://cocodataset.org/)
 
@@ -135,7 +169,7 @@ Finally, we return to the D02 location, but this time supplement the dataset wit
 	- How many samples per class are needed to reach acceptable level
 	- Is there a difference between day/night or season?
 
-## Setup 
+## Setup/Inference Instructions
 ``` bash
 pip install -r requirements.txt
 ```
@@ -176,7 +210,7 @@ label = label_encoding[int(prediction[0]['labels'][0].to('cpu'))]
 score = prediction[0]['scores'][0].to('cpu').item()
 ```
 
-### Directory Structure
+#### Directory Structure
 ```
 project
 |	README.md
