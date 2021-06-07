@@ -12,10 +12,6 @@
     - [CalTech Camera Traps](https://beerys.github.io/CaltechCameraTraps/)
 
 ## Training Process
-- Naive Detection to build datasets
-    - explanation of model
-    - Wildlife AI microsoft citation
-    - output training data for final model
 - FRCNN for object detection
     - training data
     - load pre-trained classification resnet 50 from above into backbone
@@ -125,6 +121,7 @@ These steps are outlined in more detail below...
 - The second phase of the project leverages the [CameraTraps](https://github.com/microsoft/CameraTraps) package released by Microsoft.
 	- This package includes a naive image detector which outputs bounding boxes and classifications for 3 total classes (Animal, Human, & Vehicle)
 - We leverage this package to bootstrap our training data in order to train an object detection model specific to our project data and labels.
+    - This is done by combining the animal labelled bounding boxes from the Naive model and combining this with our labelled annotations to create an object detection training set on our previously un-localized image labels.
 - Output of model can be seen below, with bounding box coords and base class for each image
 ``` json
 {
