@@ -158,7 +158,8 @@ def get_fastai_backbone(df, dls):
 
 #### Performance
 - When evaluating our performance, we use a confidence theshold of 50% to determine the predicted class. Therefore if no bounding box classifications exceed threshold the picture is declared as empty.
-- Classification Report 
+##### Classification Report 
+
 | **Species**       | **precision** | **recall** | **fl—score** | **support** |
 |---------------|-----------|--------|----------|---------|
 | bird          | 0. 49     | 0.61   | 0.55     | 233     |
