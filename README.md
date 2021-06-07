@@ -1,28 +1,12 @@
 # Lincoln Park Camera Trap Species Identification
 ## TODO
 - finish paper from outline
-- performance figures
-    - confusion matrix
-- detailed setup/re-training instructions
 - Relevant Papers
     - [Microsoft Camera Traps](https://github.com/microsoft/CameraTraps)
     - [AI for Earth](https://www.microsoft.com/en-us/ai/ai-for-earth)
     - [Deep Learning Object Detection Methods for Ecological Camera Trap Data](https://arxiv.org/abs/1803.10842)
     - [Camera Trap ML Survey](https://github.com/agentmorris/camera-trap-ml-survey)
     - [CalTech Camera Traps](https://beerys.github.io/CaltechCameraTraps/)
-
-## Training Process
-- FRCNN for object detection
-    - training data
-    - load pre-trained classification resnet 50 from above into backbone
-    - training process
-        - 25 epochs randomly sampled dataset
-        - 25 epochs evenly distributed amongst classes
-        - 25 epochs randomly sampled dataset
-## Final Performance
-    - sample based performance (how many instances of each class to get x performance)
-![](images/class_performance.png?raw=true)
-    - potential black/white based performance if colab working
 
 ## Introduction
 One of the primary ecology activities of the Lincoln Park Zoo is to monitor the migration patterns of local animal populations and track these changes. In order to accomplish this objective, they run a quarterly initiative placing camera traps in 28 locations across the surrounding areas.
@@ -150,21 +134,55 @@ These steps are outlined in more detail below...
     }
    ]
 ```
-### Primary Animal Detection Model
-- Our base model is a [Faster R-CNN Resnet 50](https://pytorch.org/vision/stable/_modules/torchvision/models/detection/faster_rcnn.html)
-	- This model has been pre-trained on the [COCO Dataset](https://cocodataset.org/)
+### Primary Animal Detection Model (Faster Regional Convolutional Neural Network)
+- (Train_Torch_FastRCNN.ipynb)
+- Our base model is a [Faster R-CNN Resnet 50](https://pytorch.org/vision/stable/_modules/torchvision/models/detection/faster_rcnn.html) that model has been pre-trained on the [COCO Dataset](https://cocodataset.org/)
 
-### Performance
-The process to train the FRCNN Object Detection Model began with running through a single camera location, D02, for 20 epochs. This location provided the clearest images, as well as a proportionate sample of animals relative to the rest of the dataset, containing roughly 8000 images.
-Next, we run through all images with detections present for 10 epochs. This totalled roughly 35000 total images and allowed are model to increase its generalizability on unseen camera angles and conditions.
-Finally, we return to the D02 location, but this time supplement the dataset with **TODO**
-- Training Process
-    - D02
-    - All images 
-    - D02 with Image Supplementation for underrepresented classes
-- Report on performance
-	- How many samples per class are needed to reach acceptable level
-	- Is there a difference between day/night or season?
+#### Training Process
+- Before starting our training for our final object detection model, we first load our pre-trained backbone resnet50 model from our first step. The code to do so from a fast_ai CNN Learner object can be seen below.
+``` python
+def get_fastai_backbone(df, dls):
+  
+  learn = cnn_learner(dls, models.resnet50, metrics=error_rate).load('res50_stage-2')
+
+  cnn_backbone = learn.model.cuda()
+  backbone = torch.nn.Sequential(*(list(cnn_backbone.children())[:-1]))
+  backbone = resnet_fpn_backbone('resnet50', backbone)
+  return backbone
+```
+- Once our backbone is loaded we are ready to start training on the data generated from the output of our Naive Detection module in step 2.
+- The training schedule implemented can be seen below, with each iteration consisting of a warm-up Epoch, where the Learning Rate is gradually scaled up, and the remaining operating normally.
+    - 25 Epochs on same randomly sampled dataset as step 1 backbone training
+    - 25 Epochs using a stratified sampling (utils.data_utils.stratify_sample) of equal examples per each class
+    - 25 Epochs on initial randomized dataset.
+
+#### Performance
+- When evaluating our performance, we use a confidence theshold of 50% to determine the predicted class. Therefore if no bounding box classifications exceed threshold the picture is declared as empty.
+- Classification Report 
+| **Species**       | **precision** | **recall** | **fl—score** | **support** |
+|---------------|-----------|--------|----------|---------|
+| bird          | 0. 49     | 0.61   | 0.55     | 233     |
+| cat           | 0. 67     | 1      | 0.8      | 18      |
+| coyote        | 0. 51     | 0.91   | 0.66     | 87      |
+| dog           | 0. 22     | 0.85   | 0.35     | 172     |
+| e. cottontail | 0.77      | 0.76   | 0.76     | 191     |
+| empty         | 0. 94     | 0.84   | 0.88     | 6494    |
+| human         | 0. 82     | 0.43   | 0.57     | 1036    |
+| Iawn mower    | 0. 00     | 0      | 0        | 25      |
+| raccoon       | 0. 95     | 0.83   | 0.89     | 558     |
+| rat           | 0.21      | 0.5    | 0.29     | 10      |
+| squirrel      | 0. 64     | 0.8    | 0.71     | 802     |
+| striped skunk | 0. 68     | 0.93   | 0.79     | 28      |
+| v. opossum    | 0. 79     | 0.91   | 0.84     | 113     |
+| w. t. deer    | 0. 35     | 0.96   | 0.51     | 233     |
+| **accuracy**      |           |        | **0.82**     | **10000**   |
+| **macro avg**     | **0. 62**     | **0.77**   | **0.65**     | **10000**   |
+| **weighted avg**  | **0. 85**     | **0.82**   | **0.83**     | **10000**   |
+
+- How many samples are needed per class to reach acceptable performance?
+    - The below figure illustrates the relative performance of our final FR-CNN model trained on X samples per class
+    - As we can see, we reach a point of diminishing returns around roughly 250 samples per species/class
+![](images/class_performance.png?raw=true)
 
 ## Setup/Inference Instructions
 ``` bash
