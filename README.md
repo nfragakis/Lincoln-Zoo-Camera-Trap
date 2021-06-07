@@ -1,13 +1,4 @@
 # Lincoln Park Camera Trap Species Identification
-## TODO
-- finish paper from outline
-- Relevant Papers
-    - [Microsoft Camera Traps](https://github.com/microsoft/CameraTraps)
-    - [AI for Earth](https://www.microsoft.com/en-us/ai/ai-for-earth)
-    - [Deep Learning Object Detection Methods for Ecological Camera Trap Data](https://arxiv.org/abs/1803.10842)
-    - [Camera Trap ML Survey](https://github.com/agentmorris/camera-trap-ml-survey)
-    - [CalTech Camera Traps](https://beerys.github.io/CaltechCameraTraps/)
-
 ## Introduction
 One of the primary ecology activities of the Lincoln Park Zoo is to monitor the migration patterns of local animal populations and track these changes. In order to accomplish this objective, they run a quarterly initiative placing camera traps in 28 locations across the surrounding areas.
 
@@ -276,3 +267,11 @@ project
 ```
 **Image file structure is neccesary when running in colab to avoid memory constraints that occur if they're all in the same directory**
 All notebooks will run in colab with specific install/dependency commands present for each job
+
+## Relevant Papers
+    - [Microsoft Camera Traps](https://github.com/microsoft/CameraTraps)
+    - [AI for Earth](https://www.microsoft.com/en-us/ai/ai-for-earth)
+    - [Deep Learning Object Detection Methods for Ecological Camera Trap Data](https://arxiv.org/abs/1803.10842)
+    - [Camera Trap ML Survey](https://github.com/agentmorris/camera-trap-ml-survey)
+    - [CalTech Camera Traps](https://beerys.github.io/CaltechCameraTraps/)
+
