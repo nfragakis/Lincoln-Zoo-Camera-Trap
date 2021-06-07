@@ -269,9 +269,8 @@ project
 All notebooks will run in colab with specific install/dependency commands present for each job
 
 ## Relevant Papers
-    - [Microsoft Camera Traps](https://github.com/microsoft/CameraTraps)
-    - [AI for Earth](https://www.microsoft.com/en-us/ai/ai-for-earth)
-    - [Deep Learning Object Detection Methods for Ecological Camera Trap Data](https://arxiv.org/abs/1803.10842)
-    - [Camera Trap ML Survey](https://github.com/agentmorris/camera-trap-ml-survey)
-    - [CalTech Camera Traps](https://beerys.github.io/CaltechCameraTraps/)
-
+- [Microsoft Camera Traps](https://github.com/microsoft/CameraTraps)
+- [AI for Earth](https://www.microsoft.com/en-us/ai/ai-for-earth)
+- [Deep Learning Object Detection Methods for Ecological Camera Trap Data](https://arxiv.org/abs/1803.10842)
+- [Camera Trap ML Survey](https://github.com/agentmorris/camera-trap-ml-survey)
+- [CalTech Camera Traps](https://beerys.github.io/CaltechCameraTraps/)
