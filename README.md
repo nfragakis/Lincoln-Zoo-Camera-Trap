@@ -176,6 +176,13 @@ def get_fastai_backbone(df, dls):
     - As we can see, we reach a point of diminishing returns around roughly 250 samples per species/class
 ![](images/class_performance.png?raw=true)
 
+## Relevant Examples
+- [Microsoft Camera Traps](https://github.com/microsoft/CameraTraps)
+- [AI for Earth](https://www.microsoft.com/en-us/ai/ai-for-earth)
+- [Deep Learning Object Detection Methods for Ecological Camera Trap Data](https://arxiv.org/abs/1803.10842)
+- [Camera Trap ML Survey](https://github.com/agentmorris/camera-trap-ml-survey)
+- [CalTech Camera Traps](https://beerys.github.io/CaltechCameraTraps/)
+
 ## Setup/Inference Instructions
 ``` bash
 pip install -r requirements.txt
@@ -268,9 +275,3 @@ project
 **Image file structure is neccesary when running in colab to avoid memory constraints that occur if they're all in the same directory**
 All notebooks will run in colab with specific install/dependency commands present for each job
 
-## Relevant Papers
-[Microsoft Camera Traps](https://github.com/microsoft/CameraTraps)
-[AI for Earth](https://www.microsoft.com/en-us/ai/ai-for-earth)
-[Deep Learning Object Detection Methods for Ecological Camera Trap Data](https://arxiv.org/abs/1803.10842)
-[Camera Trap ML Survey](https://github.com/agentmorris/camera-trap-ml-survey)
-[CalTech Camera Traps](https://beerys.github.io/CaltechCameraTraps/)
